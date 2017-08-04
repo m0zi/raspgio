@@ -1,8 +1,15 @@
 package raspgio;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.ini4j.Wini;
 
@@ -12,7 +19,6 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.system.SystemInfo.BoardType;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -21,50 +27,138 @@ import com.sun.net.httpserver.HttpServer;
 public class RaspberryPiGPIOHomeControl
 {
 
+	private static final LinkedList<GpioPinDigitalOutput> allPins = new LinkedList<GpioPinDigitalOutput>();
+
 	public static void main(String[] args) throws IOException
 	{
-		final GpioController controller = GpioFactory.getInstance();
-		final HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-
-		System.out.println(RaspiPin.allPins(BoardType.RaspberryPi_B_Plus));
-		
-		Wini wini = new Wini(Paths.get(args[0]).toFile());
+		GpioController gpioController = GpioFactory.getInstance();
+		HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+		Wini wini = new Wini(Paths.get(args[0], new String[0]).toFile());
 		wini.forEach((sectionName, section) ->
 		{
 			if (sectionName != null)
 			{
-				Pin pinByName = RaspiPin.getPinByName(sectionName);
-				if (pinByName == null)
-					throw new IllegalArgumentException("Pin with name " + sectionName + " could not be found.");
-				GpioPinDigitalOutput test = controller.provisionDigitalOutputPin(pinByName, PinState.HIGH);
 				section.forEach((k, v) ->
 				{
-					if (k != null)
-						server.createContext('/' + k, new GPIOHandler(test, PinState.valueOf(v)));
+					Pin pinByName = RaspiPin.getPinByName((String) k);
+					if (pinByName == null) { throw new IllegalArgumentException("Pin with name " + k + " could not be found."); }
+					System.out.println("PinByName: k='" + k + "'\t context='" + v + "'\t pin.getName='" + pinByName.getName() + "'\t pin.getAddress=" + pinByName.getAddress());
+					GpioPinDigitalOutput test = gpioController.provisionDigitalOutputPin(pinByName, PinState.HIGH);
+					allPins.add(test);
+					server.createContext(String.valueOf('/') + v, new GPIOHandler(test));
 				});
 			}
 		});
+		server.createContext("/reset", new HttpHandler()
+		{
 
-		server.setExecutor(null); // creates a default executor
+			@Override
+			public void handle(HttpExchange t) throws IOException
+			{
+				System.out.println("Reset init");
+				for (GpioPinDigitalOutput pin : allPins)
+				{
+					System.out.print("Set pin " + pin.getName());
+					pin.setState(PinState.HIGH);
+					System.out.println(" to state " + (Object) pin.getState());
+				}
+				System.out.println("Reset done");
+				t.sendResponseHeaders(200, -1);
+			}
+		});
+		server.createContext("/test", new HttpHandler()
+		{
+
+			@Override
+			public void handle(HttpExchange t) throws IOException
+			{
+				System.out.println("Reset init");
+				for (GpioPinDigitalOutput pin : allPins)
+				{
+					System.out.print("Set pin " + pin.getName());
+					pin.setState(PinState.LOW);
+					System.out.println(" to state " + (Object) pin.getState());
+				}
+				System.out.println("Reset done");
+				t.sendResponseHeaders(200, -1);
+			}
+		});
+		server.createContext("/shutdown", new HttpHandler()
+		{
+
+			@Override
+			public void handle(HttpExchange t) throws IOException
+			{
+				t.sendResponseHeaders(200, -1);
+				t.getResponseBody().write("HalloWelt".getBytes());
+				System.exit(0);
+			}
+		});
+		server.setExecutor(null);
 		server.start();
 	}
 
 	static class GPIOHandler implements HttpHandler
 	{
-		private final GpioPinDigitalOutput	pin;
-		private final PinState				state;
+		private final GpioPinDigitalOutput pin;
 
-		public GPIOHandler(final GpioPinDigitalOutput pin, final PinState state)
+		public GPIOHandler(final GpioPinDigitalOutput pin)
 		{
 			this.pin = pin;
-			this.state = state;
 		}
 
 		@Override
 		public void handle(final HttpExchange t) throws IOException
 		{
-			pin.setState(state);
-			t.sendResponseHeaders(200, -1);
+			final String state = splitQuery(t.getRequestURI()).get("state").get(0);
+			if (state == null)
+			{
+				t.sendResponseHeaders(404, -1L);
+			}
+			switch (state.toLowerCase())
+			{
+				case "toggle":
+				{
+					this.pin.toggle();
+					break;
+				}
+				case "on":
+				{
+					this.pin.setState(PinState.LOW);
+					break;
+				}
+				case "off":
+				{
+					this.pin.setState(PinState.HIGH);
+					break;
+				}
+				default:
+					break;
+			}
+			t.sendResponseHeaders(405, -1L);
+			System.out.println(String.valueOf(this.pin.getName()) + " was set to " + this.pin.getState());
+			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+			t.sendResponseHeaders(200, -1L);
+		}
+
+		public static Map<String, List<String>> splitQuery(final URI uri) throws UnsupportedEncodingException
+		{
+			final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
+			final String[] pairs = uri.getQuery().split("&");
+			String[] array;
+			for (int length = (array = pairs).length, i = 0; i < length; ++i)
+			{
+				final String pair = array[i];
+				final int idx = pair.indexOf("=");
+				final String key = (idx > 0) ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+				if (!query_pairs.containsKey(key))
+				{
+					query_pairs.put(key, new LinkedList<String>());
+				}
+				final String value = (idx > 0 && pair.length() > idx + 1) ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
+				query_pairs.get(key).add(value);
+			}
+			return query_pairs;
 		}
 	}
 }
