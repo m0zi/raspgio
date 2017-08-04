@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.micha.raspgpio</groupId>
 	<artifactId>raspgio</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>com.pi4j</groupId>
@@ -16,6 +16,11 @@
 			<version>0.5.2</version>
 		</dependency>
 	</dependencies>
+	<properties>
+	    <maven.compiler.source>1.8</maven.compiler.source>
+	    <maven.compiler.target>1.8</maven.compiler.target>
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  	</properties>
 
 	<build>
 		<plugins>

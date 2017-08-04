@@ -12,6 +12,7 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.system.SystemInfo.BoardType;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -25,6 +26,8 @@ public class RaspberryPiGPIOHomeControl
 		final GpioController controller = GpioFactory.getInstance();
 		final HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
 
+		System.out.println(RaspiPin.allPins(BoardType.RaspberryPi_B_Plus));
+		
 		Wini wini = new Wini(Paths.get(args[0]).toFile());
 		wini.forEach((sectionName, section) ->
 		{
