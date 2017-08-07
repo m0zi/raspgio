@@ -133,9 +133,9 @@ public class RaspberryPiGPIOHomeControl
 					break;
 				}
 				default:
+					t.sendResponseHeaders(405, -1L);
 					break;
 			}
-			t.sendResponseHeaders(405, -1L);
 			System.out.println(String.valueOf(this.pin.getName()) + " was set to " + this.pin.getState());
 			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 			t.sendResponseHeaders(200, -1L);
