@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.ini4j.Wini;
 
@@ -27,7 +28,9 @@ import com.sun.net.httpserver.HttpServer;
 public class RaspberryPiGPIOHomeControl
 {
 
-	private static final LinkedList<GpioPinDigitalOutput> allPins = new LinkedList<GpioPinDigitalOutput>();
+	private final static Logger								LOGGER	= Logger.getLogger(RaspberryPiGPIOHomeControl.class.getName());
+
+	private static final LinkedList<GpioPinDigitalOutput>	allPins	= new LinkedList<GpioPinDigitalOutput>();
 
 	public static void main(String[] args) throws IOException
 	{
@@ -42,7 +45,7 @@ public class RaspberryPiGPIOHomeControl
 				{
 					Pin pinByName = RaspiPin.getPinByName((String) k);
 					if (pinByName == null) { throw new IllegalArgumentException("Pin with name " + k + " could not be found."); }
-					System.out.println("PinByName: k='" + k + "'\t context='" + v + "'\t pin.getName='" + pinByName.getName() + "'\t pin.getAddress=" + pinByName.getAddress());
+					LOGGER.finest("PinByName: k='" + k + "'\t context='" + v + "'\t pin.getName='" + pinByName.getName() + "'\t pin.getAddress=" + pinByName.getAddress());
 					GpioPinDigitalOutput test = gpioController.provisionDigitalOutputPin(pinByName, PinState.HIGH);
 					allPins.add(test);
 					server.createContext(String.valueOf('/') + v, new GPIOHandler(test));
@@ -55,14 +58,13 @@ public class RaspberryPiGPIOHomeControl
 			@Override
 			public void handle(HttpExchange t) throws IOException
 			{
-				System.out.println("Reset init");
+				LOGGER.finer("Reset init");
 				for (GpioPinDigitalOutput pin : allPins)
 				{
-					System.out.print("Set pin " + pin.getName());
 					pin.setState(PinState.HIGH);
-					System.out.println(" to state " + (Object) pin.getState());
+					LOGGER.finest("Set pin " + pin.getName() + " to state " + pin.getState());
 				}
-				System.out.println("Reset done");
+				LOGGER.info("Reset done");
 				t.sendResponseHeaders(200, -1);
 			}
 		});
@@ -72,14 +74,13 @@ public class RaspberryPiGPIOHomeControl
 			@Override
 			public void handle(HttpExchange t) throws IOException
 			{
-				System.out.println("Reset init");
+				LOGGER.finer("Test init");
 				for (GpioPinDigitalOutput pin : allPins)
 				{
-					System.out.print("Set pin " + pin.getName());
 					pin.setState(PinState.LOW);
-					System.out.println(" to state " + (Object) pin.getState());
+					LOGGER.finest("Set pin " + pin.getName() + " to state " + (Object) pin.getState());
 				}
-				System.out.println("Reset done");
+				LOGGER.info("Test done");
 				t.sendResponseHeaders(200, -1);
 			}
 		});
@@ -136,7 +137,7 @@ public class RaspberryPiGPIOHomeControl
 					t.sendResponseHeaders(405, -1L);
 					break;
 			}
-			System.out.println(String.valueOf(this.pin.getName()) + " was set to " + this.pin.getState());
+			LOGGER.info(String.valueOf(this.pin.getName()) + " was set to " + this.pin.getState());
 			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 			t.sendResponseHeaders(200, -1L);
 		}
@@ -145,10 +146,8 @@ public class RaspberryPiGPIOHomeControl
 		{
 			final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();
 			final String[] pairs = uri.getQuery().split("&");
-			String[] array;
-			for (int length = (array = pairs).length, i = 0; i < length; ++i)
+			for (String pair : pairs)
 			{
-				final String pair = array[i];
 				final int idx = pair.indexOf("=");
 				final String key = (idx > 0) ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
 				if (!query_pairs.containsKey(key))
