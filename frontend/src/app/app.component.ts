@@ -1,18 +1,20 @@
-import {Component} from '@angular/core';
-import {SendCommandService} from "./send-command.service";
-import {Relay} from "./relay";
+import { Component } from '@angular/core';
+import { Platform } from 'ionic-angular';
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
+
+import { TabsPage } from '../pages/tabs/tabs';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+  templateUrl: 'app.html'
 })
-export class AppComponent {
-    constructor(public service: SendCommandService) {
-    }
+export class MyApp {
+  rootPage:any = TabsPage;
 
-    public change(relay: Relay, e) {
-        this.service.set(relay.id, !relay.state);
-    }
-
+  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
+    platform.ready().then(() => {
+      statusBar.styleDefault();
+      splashScreen.hide();
+    });
+  }
 }

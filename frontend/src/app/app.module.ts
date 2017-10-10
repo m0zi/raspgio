@@ -1,24 +1,44 @@
+import {ErrorHandler, NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
+import {IonicApp, IonicErrorHandler, IonicModule} from 'ionic-angular';
 
-import {AppComponent} from './app.component';
-import {HttpClientModule} from "@angular/common/http";
-import {SendCommandService} from "./send-command.service";
-import {FormsModule} from "@angular/forms";
+import {StatusBar} from '@ionic-native/status-bar';
+import {HttpModule} from "@angular/http";
+import {SplashScreen} from '@ionic-native/splash-screen';
+
+import {MyApp} from './app.component';
+
+import {TabsPage} from '../pages/tabs/tabs';
+import {VideoPage} from "../pages/video/video";
+import {SwitchesPage} from "../pages/switches/switches";
 
 @NgModule({
     declarations: [
-        AppComponent
+        MyApp,
+        VideoPage,
+        SwitchesPage,
+        TabsPage
     ],
     imports: [
         BrowserModule,
-        HttpClientModule,
-        FormsModule
+        HttpModule,
+        IonicModule.forRoot(MyApp)
+    ],
+    bootstrap: [IonicApp],
+    entryComponents: [
+        MyApp,
+        VideoPage,
+        SwitchesPage,
+        TabsPage
     ],
     providers: [
-        SendCommandService
-    ],
-    bootstrap: [AppComponent]
+        StatusBar,
+        SplashScreen,
+        {
+            provide: ErrorHandler,
+            useClass: IonicErrorHandler
+        }
+    ]
 })
 export class AppModule {
 }
