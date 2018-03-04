@@ -1,9 +1,11 @@
 package raspgio;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.ini4j.Wini;
@@ -23,73 +25,53 @@ public class RaspberryPiGPIOHomeControl {
 
 	private final static Logger LOGGER = Logger.getLogger(RaspberryPiGPIOHomeControl.class.getName());
 
-	private static final LinkedList<GpioPinDigitalOutput> allPins = new LinkedList<GpioPinDigitalOutput>();
+	private static final LinkedList<GpioPinDigitalOutput> gpioPins = new LinkedList<GpioPinDigitalOutput>();
 
 	public static void main(String[] args) throws IOException {
-		GpioController gpioController = GpioFactory.getInstance();		
-		HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
+		Properties states = new Properties();
+		states.load(new FileInputStream(args[1]));
+
+		// initialize controller
+		GpioController gpioController = GpioFactory.getInstance();
+		HttpServer httpServer = HttpServer.create(new InetSocketAddress(8000), 0);
 		Wini wini = new Wini(Paths.get(args[0], new String[0]).toFile());
 		
 		wini.forEach((sectionName, section) -> {
 			if (sectionName != null) {
 				section.forEach((key, value) -> {
-					Pin pinByName = RaspiPin.getPinByName((String) key);
-					
-					if (pinByName == null) {
+					Pin pin = RaspiPin.getPinByName((String) key);
+
+					if (pin == null) {
 						throw new IllegalArgumentException("Pin with name " + key + " could not be found.");
 					}
-					
-					LOGGER.finest("PinByName: k='" + key + "'\t context='" + value + "'\t pin.getName='" + pinByName.getName()
-							+ "'\t pin.getAddress=" + pinByName.getAddress());
-					
-					GpioPinDigitalOutput gpioPinDigitalOutput = gpioController.provisionDigitalOutputPin(pinByName, PinState.HIGH);
-					allPins.add(gpioPinDigitalOutput);
-					
-					server.createContext(String.valueOf('/') + value, new GPIOHandler(gpioPinDigitalOutput));
+
+					LOGGER.finest("PinByName: k='" + key + "'\t context='" + value + "'\t pin.getName='" + pin.getName() + "'\t pin.getAddress=" + pin.getAddress());
+
+					GpioPinDigitalOutput gpioPinDigitalOutput = gpioController.provisionDigitalOutputPin(pin, PinState.HIGH);
+					gpioPins.add(gpioPinDigitalOutput);
+
+					httpServer.createContext(String.valueOf('/') + value, new GPIOHandler(gpioPinDigitalOutput, states, args[1]));
 				});
 			}
 		});
-		
-		server.createContext("/reset", new HttpHandler() {
+
+		// load states
+		for (GpioPinDigitalOutput pin : gpioPins) {
+			pin.setState(states.containsKey(pin.getName()) ? PinState.valueOf(states.getProperty(pin.getName())) : PinState.HIGH);
+		}
+
+		// add shutdown routine
+		httpServer.createContext("/shutdown", new HttpHandler() {
 			@Override
 			public void handle(HttpExchange t) throws IOException {
-				LOGGER.finer("Reset init");
-				
-				for (GpioPinDigitalOutput pin : allPins) {
-					pin.setState(PinState.HIGH);
-					LOGGER.finest("Set pin " + pin.getName() + " to state " + pin.getState());
-				}
-				
-				LOGGER.info("Reset done");				
 				t.sendResponseHeaders(200, -1);
-			}
-		});
-		
-		server.createContext("/test", new HttpHandler() {
-			@Override
-			public void handle(HttpExchange t) throws IOException {
-				LOGGER.finer("Test init");
-				
-				for (GpioPinDigitalOutput pin : allPins) {
-					pin.setState(PinState.LOW);
-					LOGGER.finest("Set pin " + pin.getName() + " to state " + (Object) pin.getState());
-				}
-				
-				LOGGER.info("Test done");
-				t.sendResponseHeaders(200, -1);
-			}
-		});
-		
-		server.createContext("/shutdown", new HttpHandler() {
-			@Override
-			public void handle(HttpExchange t) throws IOException {				
-				t.sendResponseHeaders(200, -1);				
 				System.exit(0);
 			}
 		});
-		
-		server.setExecutor(null);
-		server.start();
+
+		// start server
+		httpServer.setExecutor(null);
+		httpServer.start();
 	}
 
 }

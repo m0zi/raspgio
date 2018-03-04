@@ -1,5 +1,7 @@
 package raspgio;
 
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -8,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
@@ -17,52 +20,77 @@ import com.sun.net.httpserver.HttpHandler;
 
 @SuppressWarnings("restriction")
 public class GPIOHandler implements HttpHandler {
-	
+
 	private final static Logger LOGGER = Logger.getLogger(GPIOHandler.class.getName());
 
 	private final GpioPinDigitalOutput pin;
 
-	public GPIOHandler(final GpioPinDigitalOutput pin) {
+	private final String statesFile;
+
+	private final Properties states;
+
+	public GPIOHandler(final GpioPinDigitalOutput pin, Properties states, String statesFile) {
 		this.pin = pin;
+		this.statesFile = statesFile;
+		this.states = states;
 	}
 
 	@Override
-	public void handle(final HttpExchange t) throws IOException {
-		final String state = GPIOHandler.splitQuery(t.getRequestURI()).get("state").get(0);
+	public void handle(final HttpExchange httpExchange) throws IOException {
+		final String action = GPIOHandler.splitQuery(httpExchange.getRequestURI()).get("action").get(0);
 
-		if (state == null) {
-			t.sendResponseHeaders(404, -1L);
+		if (action == null) {
+			httpExchange.sendResponseHeaders(404, -1L);
 		}
 
-		switch (state.toLowerCase()) {
-
-		case "toggle": {
-			this.pin.toggle();
-			break;
+		switch (action.toLowerCase()) {
+			case "toggle": {
+				this.pin.toggle();
+				break;
+			}
+	
+			case "on": {
+				this.pin.setState(PinState.LOW);
+				break;
+			}
+	
+			case "off": {
+				this.pin.setState(PinState.HIGH);
+				break;
+			}
+	
+			case "get": {
+				break;
+			}
+	
+			default: {
+				httpExchange.sendResponseHeaders(405, -1L);
+				break;
+			}
 		}
 
-		case "on": {
-			this.pin.setState(PinState.LOW);
-			break;
-		}
+		PinState pinState = this.pin.getState();
+		String response = "{ \"state\": " + pinState.isLow() + " }";
 
-		case "off": {
-			this.pin.setState(PinState.HIGH);
-			break;
-		}
+		LOGGER.info(String.valueOf(this.pin.getName()) + " was set to " + pinState);
+		LOGGER.info(String.valueOf("Server Response:  " + response));
 
-		default:
-			t.sendResponseHeaders(405, -1L);
-			break;
-		}
+		httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+		httpExchange.getResponseHeaders().add("Content-Type", "application/json");
 
-		LOGGER.info(String.valueOf(this.pin.getName()) + " was set to " + this.pin.getState());
+		DataOutputStream out = new DataOutputStream(httpExchange.getResponseBody());
 
-		t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-		t.sendResponseHeaders(200, -1L);
+		httpExchange.sendResponseHeaders(200, 0);
+
+		out.writeBytes(response);
+		out.flush();
+		out.close();
+
+		states.setProperty(this.pin.getName(), pinState.toString());
+		states.store(new FileOutputStream(this.statesFile), null);
 	}
 
-	public static Map<String, List<String>> splitQuery(final URI uri) throws UnsupportedEncodingException {
+	private static Map<String, List<String>> splitQuery(final URI uri) throws UnsupportedEncodingException {
 		final Map<String, List<String>> queryPairs = new LinkedHashMap<String, List<String>>();
 		final String[] pairs = uri.getQuery().split("&");
 
@@ -74,8 +102,7 @@ public class GPIOHandler implements HttpHandler {
 				queryPairs.put(key, new LinkedList<String>());
 			}
 
-			final String value = (index > 0 && pair.length() > index + 1)
-					? URLDecoder.decode(pair.substring(index + 1), "UTF-8") : null;
+			final String value = (index > 0 && pair.length() > index + 1) ? URLDecoder.decode(pair.substring(index + 1), "UTF-8") : null;
 
 			queryPairs.get(key).add(value);
 		}
