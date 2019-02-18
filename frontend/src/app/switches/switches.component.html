@@ -54,23 +54,23 @@
 
                 <div class="col-sm-6 mt-2">
                     <div class="row">
-                        <div *ngIf="!relayOutletTV.state" class="col-sm-12">
-                            <button (click)="set(relayOutletTV, true)" class="btn btn-block btn-sm btn-success">
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
-                                    <g stroke-width="2" transform="translate(0, 0)">
-                                        <line data-cap="butt" fill="none" stroke="#ffffff" stroke-width="2" stroke-miterlimit="10" x1="32" y1="43" x2="32" y2="35" stroke-linejoin="miter" stroke-linecap="butt"></line>
-                                        <rect x="7" y="3" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" width="50" height="32" stroke-linejoin="miter"></rect>
-                                        <rect x="12" y="8" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" width="40" height="22" stroke-linejoin="miter"></rect>
-                                        <polyline fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" points="24,47 24,43 40,43 40,47 " stroke-linejoin="miter"></polyline>
-                                        <polyline data-color="color-2" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" points=" 62,61 62,47 2,47 2,61 " stroke-linejoin="miter"></polyline>
-                                        <line data-color="color-2" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" x1="2" y1="55" x2="62" y2="55" stroke-linejoin="miter"></line>
-                                    </g>
-                                </svg>
-                            </button>
-                        </div>
-
                         <div *ngIf="relayOutletTV.state" class="col-sm-12">
-                            <button (click)="set(relayOutletTV, false)" class="btn btn-block btn-sm btn-danger">
+                            <button (click)="set(relayOutletTV, false)" class="btn btn-block btn-sm btn-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
+                                    <g stroke-width="2" transform="translate(0, 0)">
+                                        <line data-cap="butt" fill="none" stroke="#ffffff" stroke-width="2" stroke-miterlimit="10" x1="32" y1="43" x2="32" y2="35" stroke-linejoin="miter" stroke-linecap="butt"></line>
+                                        <rect x="7" y="3" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" width="50" height="32" stroke-linejoin="miter"></rect>
+                                        <rect x="12" y="8" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" width="40" height="22" stroke-linejoin="miter"></rect>
+                                        <polyline fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" points="24,47 24,43 40,43 40,47 " stroke-linejoin="miter"></polyline>
+                                        <polyline data-color="color-2" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" points=" 62,61 62,47 2,47 2,61 " stroke-linejoin="miter"></polyline>
+                                        <line data-color="color-2" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="square" stroke-miterlimit="10" x1="2" y1="55" x2="62" y2="55" stroke-linejoin="miter"></line>
+                                    </g>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div *ngIf="!relayOutletTV.state" class="col-sm-12">
+                            <button (click)="set(relayOutletTV, true)" class="btn btn-block btn-sm btn-danger">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
                                     <g stroke-width="2" transform="translate(0, 0)">
                                         <line data-cap="butt" fill="none" stroke="#ffffff" stroke-width="2" stroke-miterlimit="10" x1="32" y1="43" x2="32" y2="35" stroke-linejoin="miter" stroke-linecap="butt"></line>
@@ -86,18 +86,18 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div *ngIf="!relayLightShelf.state" class="col-sm-12">
-                            <button (click)="set(relayLightShelf, true)" class="btn btn-block btn-sm btn-success">
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
-                                    <g stroke-width="2" transform="translate(0, 0)">
-                                        <rect x="3" y="3" width="58" height="58" fill="none" stroke="#ffffff" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2" stroke-linejoin="miter"></rect>
-                                    </g>
-                                </svg>
-                            </button>
-                        </div>
-
                         <div *ngIf="relayLightShelf.state" class="col-sm-12">
-                            <button (click)="set(relayLightShelf, false)" class="btn btn-block btn-sm btn-danger">
+                            <button (click)="set(relayLightShelf, false)" class="btn btn-block btn-sm btn-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
+                                    <g stroke-width="2" transform="translate(0, 0)">
+                                        <rect x="3" y="3" width="58" height="58" fill="none" stroke="#ffffff" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2" stroke-linejoin="miter"></rect>
+                                    </g>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div *ngIf="!relayLightShelf.state" class="col-sm-12">
+                            <button (click)="set(relayLightShelf, true)" class="btn btn-block btn-sm btn-danger">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
                                     <g stroke-width="2" transform="translate(0, 0)">
                                         <rect x="3" y="3" width="58" height="58" fill="none" stroke="#ffffff" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2" stroke-linejoin="miter"></rect>
@@ -108,8 +108,8 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div *ngIf="!relayLightFireplace.state" class="col-sm-12">
-                            <button (click)="set(relayLightFireplace, true)" class="btn btn-block btn-sm btn-success">
+                        <div *ngIf="relayLightFireplace.state" class="col-sm-12">
+                            <button (click)="set(relayLightFireplace, false)" class="btn btn-block btn-sm btn-success">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
                                     <g stroke-width="2" transform="translate(0, 0)">
                                         <polyline data-cap="butt" data-color="color-2" fill="none" stroke="#ffffff" stroke-width="2" stroke-miterlimit="10" points="32,51.2 54.5,59.3 58,49.6 47.1,45.7 " stroke-linejoin="miter" stroke-linecap="butt"></polyline>
@@ -122,8 +122,8 @@
                             </button>
                         </div>
 
-                        <div *ngIf="relayLightFireplace.state" class="col-sm-12">
-                            <button (click)="set(relayLightFireplace, false)" class="btn btn-block btn-sm btn-danger">
+                        <div *ngIf="!relayLightFireplace.state" class="col-sm-12">
+                            <button (click)="set(relayLightFireplace, true)" class="btn btn-block btn-sm btn-danger">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
                                     <g stroke-width="2" transform="translate(0, 0)">
                                         <polyline data-cap="butt" data-color="color-2" fill="none" stroke="#ffffff" stroke-width="2" stroke-miterlimit="10" points="32,51.2 54.5,59.3 58,49.6 47.1,45.7 " stroke-linejoin="miter" stroke-linecap="butt"></polyline>
@@ -138,8 +138,8 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div *ngIf="!relayHeatingFireplace.state" class="col-sm-12">
-                            <button (click)="set(relayHeatingFireplace, true)" class="btn btn-block btn-sm btn-success">
+                        <div *ngIf="relayHeatingFireplace.state" class="col-sm-12">
+                            <button (click)="set(relayHeatingFireplace, false)" class="btn btn-block btn-sm btn-success">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
                                     <g stroke-width="2" transform="translate(0, 0)">
                                         <path d="M54,45.048A69.75,69.75,0,0,1,62,47V10S50,6,32,6,2,10,2,10V47a75.575,75.575,0,0,1,10-2.318" fill="none" stroke="#ffffff" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2" stroke-linejoin="miter"></path>
@@ -151,8 +151,8 @@
                             </button>
                         </div>
 
-                        <div *ngIf="relayHeatingFireplace.state" class="col-sm-12">
-                            <button (click)="set(relayHeatingFireplace, false)" class="btn btn-block btn-sm btn-danger">
+                        <div *ngIf="!relayHeatingFireplace.state" class="col-sm-12">
+                            <button (click)="set(relayHeatingFireplace, true)" class="btn btn-block btn-sm btn-danger">
                                 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="64px" height="64px" viewBox="0 0 64 64" stroke-width="2">
                                     <g stroke-width="2" transform="translate(0, 0)">
                                         <path d="M54,45.048A69.75,69.75,0,0,1,62,47V10S50,6,32,6,2,10,2,10V47a75.575,75.575,0,0,1,10-2.318" fill="none" stroke="#ffffff" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2" stroke-linejoin="miter"></path>

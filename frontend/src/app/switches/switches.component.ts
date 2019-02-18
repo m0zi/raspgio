@@ -27,14 +27,14 @@ export class SwitchesComponent implements OnInit {
     constructor(private _http: HttpClient) {
         this._url = 'http://192.168.0.5:8000/';
 
-        this.relayLightCouch = new Relay('links', 5);
-        this.relayLightDinner = new Relay('links', 6);
-        this.relayLightPassage = new Relay('links', 7);
+        this.relayLightCouch = new Relay('links', 0);
+        this.relayLightDinner = new Relay('links', 1);
+        this.relayLightPassage = new Relay('links', 2);
 
-        this.relayOutletTV = new Relay('rechts', 4);
-        this.relayLightShelf = new Relay('rechts', 5);
-        this.relayLightFireplace = new Relay('rechts', 6);
-        this.relayHeatingFireplace = new Relay('rechts', 7);
+        this.relayOutletTV = new Relay('rechts', 0);
+        this.relayLightShelf = new Relay('rechts', 2);
+        this.relayLightFireplace = new Relay('rechts', 3);
+        this.relayHeatingFireplace = new Relay('rechts', 1);
     }
 
     public ngOnInit() {
