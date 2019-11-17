@@ -1,23 +1,21 @@
 export class Relay {
-    private location: string;
-    private index: number;
+    private index: string;
     public state: boolean;
 
-    constructor(location: string, index: number) {
-        this.location = location;
-        this.index = index;
+    constructor(index: number) {
+        this.index = (index + '').padStart(2, '0');
     }
 
     public getUrlToggle() {
-        return this.location + '_' + this.index + '?action=toggle';
+        return 'relais_' + this.index + '?action=toggle';
     }
 
     public getUrlState() {
-        return this.location + '_' + this.index + '?action=get';
+        return 'relais_' + this.index + '?action=get';
     }
 
     public getUrlSwitch(state: boolean) {
-        return this.location + '_' + this.index + '?action=' + (state ? 'on' : 'off');
+        return 'relais_' + this.index + '?action=' + (state ? 'on' : 'off');
     }
 }
 
